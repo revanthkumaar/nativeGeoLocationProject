@@ -1,5 +1,5 @@
-import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import React, {useState} from 'react';
+import {Linking, StyleSheet, Text, View} from 'react-native';
 import RNLocation from 'react-native-library';
 
 RNLocation.configure({
@@ -10,6 +10,8 @@ RNLocation.configure({
 //location will change before a new location is updated
 
 const App = () => {
+  [viewLocation, isViewLocation] = useState([]);
+
   //click on Get location - action
   const permissionHandle = async () => {
     console.log('inside the async call-1');
@@ -56,6 +58,7 @@ const App = () => {
       });
       console.log(permission);
       location = await RNLocation.getLatestLocation({timeout: 100});
+      isViewLocation(location);
       console.log(
         location,
         location.longitude,
@@ -74,17 +77,33 @@ const App = () => {
     }
   };
 
+  const tweetLocation = () => {
+    let twitterParams = [];
+
+    try {
+
+      if(tweet){
+        twitterParams.push(${tweet});
+        const url =  'https://twitter.com/intent/tweet?' + twitterParams.join('&');
+        Linking.openURL(url);
+      }
+    }
+    catch(error){
+      console.error(error)
+    }
+  };
+
   return (
     <View>
       <View
         style={{marginTop: 10, padding: 10, borderRadius: 10, width: '40%'}}>
         <Button title="Get Location" onPress={permissionHandle} />
       </View>
-      <Text>Latitude:</Text>
-      <Text>Longitude:</Text>
+      <Text>Latitude: {viewLocation.latitude}</Text>
+      <Text>Longitude:{viewLocation.longitude}</Text>
       <View
         style={{marginTop: 10, padding: 10, borderRadius: 10, width: '40%'}}>
-        <Button title="Send Location" />
+        <Button title="Send Location" onPress={tweetLocation} />
       </View>
     </View>
   );
